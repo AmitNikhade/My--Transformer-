@@ -130,13 +130,16 @@ class Transformer(nn.Module):
         embeddings = self.emb(x)
         pos_embeddings = self.Pos_Embedding(embeddings)
         embeddings_wp = self.dropout(embeddings+pos_embeddings)
-        enc = self.Encoder(embeddings_wp, x_mask)
+        for e in self._layers_e:
+            enc = e.forward(embeddings_wp, x_mask)
+
     
         embeddings2 = self.emb(y)
         pos_embeddings2 = self.Pos_Embedding(embeddings2)
         embeddings_wp2 = self.dropout(embeddings2+pos_embeddings2)
-        dec = self.Decoder(embeddings_wp2, enc, x_mask, y_mask)
-     
+        for d in self._layers_d:
+            dec = d.forward(embeddings_wp2, enc, x_mask, y_mask)
+
         lin = self.linear(dec)
         soft = self.log_softmax(lin)
 
